@@ -3,60 +3,85 @@
 @theme {
   --font-serif: 'Playfair Display', Georgia, serif;
   --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
-  --color-canvas: #080808;
-  --color-surface-elevated: #101010;
-  --color-surface-panel: #141414;
-  --color-gold: #C6A477;
-  --color-gold-light: #e5c192;
-  --color-gold-tint: rgba(198, 164, 119, 0.18);
-  --color-ivory: #F5F0E8;
-  --color-stone-muted: #A6A19A;
+  --color-canvas: #F7F5F0;
+  --color-navbar: #F7F5F0;
+  --color-card: #EDEAE3;
+  --color-heading: #252525;
+  --color-body: #68645E;
+  --color-accent: #A68B6A;
+  --color-border: #DDD8CF;
+  --color-btn-primary: #252525;
+  --color-btn-text: #FFFFFF;
 }
 
 @layer base {
   body {
-    background-color: #080808;
-    color: #F5F0E8;
+    background-color: #F7F5F0;
+    color: #68645E;
     font-family: 'Manrope', sans-serif;
   }
 
-  h1, h2, h3, h4, .font-editorial {
+  h1, h2, h3, h4, .font-serif {
     font-family: 'Playfair Display', Georgia, serif;
+    color: #252525;
   }
 }
 
-/* Custom cinematic grain & subtle projection lighting */
-.cinematic-vignette {
-  background: radial-gradient(circle at 50% 30%, rgba(20, 20, 20, 0) 0%, rgba(8, 8, 8, 0.7) 70%, rgba(8, 8, 8, 0.95) 100%);
+/* Subtle editorial shadow & halo */
+.editorial-shadow {
+  box-shadow: 0 4px 20px -2px rgba(37, 37, 37, 0.05), 0 2px 6px -1px rgba(37, 37, 37, 0.03);
+}
+
+.editorial-shadow-lg {
+  box-shadow: 0 16px 36px -4px rgba(37, 37, 37, 0.08), 0 4px 12px -2px rgba(37, 37, 37, 0.04);
 }
 
 .gold-halo {
-  box-shadow: 0 16px 48px -12px rgba(198, 164, 119, 0.14);
+  box-shadow: 0 8px 24px -4px rgba(37, 37, 37, 0.18);
 }
 
-.gold-halo-lg {
-  box-shadow: 0 24px 64px -12px rgba(198, 164, 119, 0.22);
-}
-
-/* Crisp 0px borders */
-* {
-  border-radius: 0px !important;
-}
-
-/* Custom scrollbars */
+/* Custom scrollbars matching warm editorial palette */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #080808;
+  background: #F7F5F0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2a2825;
+  background: #DDD8CF;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #C6A477;
+  background: #A68B6A;
 }
+
+/* Focus styles for keyboard accessibility */
+:focus-visible {
+  outline: 2px solid #A68B6A;
+  outline-offset: 2px;
+}
+
+/* Touch ergonomics & responsive mobile scroll */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Mobile scrollbar hiding utility */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile safe area spacing */
+.safe-pb {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+

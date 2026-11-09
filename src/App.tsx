@@ -1,172 +1,207 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Navigation } from './components/Navigation';
 import { HeroSection } from './components/HeroSection';
-import { ScreeningRoom } from './components/ScreeningRoom';
-import { EditorialShowcase } from './components/EditorialShowcase';
-import { ExhibitionGallerySection } from './components/ExhibitionGallerySection';
-import { VaultAndPhilosophy } from './components/VaultAndPhilosophy';
+import { TrustIndicators } from './components/TrustIndicators';
+import { FeaturedWeddingStories } from './components/FeaturedWeddingStories';
+import { CinematicFilmsSection } from './components/CinematicFilmsSection';
+import { ServicesSection } from './components/ServicesSection';
+import { OurApproachSection } from './components/OurApproachSection';
+import { TestimonialsSection } from './components/TestimonialsSection';
+import { FAQSection } from './components/FAQSection';
+import { FinalBookingCTA } from './components/FinalBookingCTA';
+import { ArchivalFooter } from './components/ArchivalFooter';
 import { ExhibitionLightbox } from './components/ExhibitionLightbox';
 import { ClientCommissionDrawer } from './components/ClientCommissionDrawer';
-import { ArchivalFooter } from './components/ArchivalFooter';
-import { WeddingStory, STORIES } from './data/weddingData';
+import { StoryItem } from './data/weddingData';
 
-// Cinematic editorial transition curve
-const cinematicFadeIn = {
-  initial: { opacity: 0, y: 40 },
+// Restrained cinematic scroll fade-in
+const sectionFadeIn = {
+  initial: { opacity: 0, y: 30 },
   whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.12 },
+  viewport: { once: true, amount: 0.1 },
   transition: {
-    duration: 0.9,
-    ease: [0.22, 1, 0.36, 1] as const, // Smooth luxury cubic-bezier ease-out
+    duration: 0.8,
+    ease: [0.22, 1, 0.36, 1] as const,
   },
 };
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('showcase');
-  const [aspectRatio, setAspectRatio] = useState<'2.39:1' | '16:9'>('2.39:1');
-  const [isCommissionOpen, setIsCommissionOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('hero');
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
 
   // Lightbox State
   const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [lightboxStory, setLightboxStory] = useState<WeddingStory | null>(null);
+  const [selectedStory, setSelectedStory] = useState<StoryItem | null>(null);
   const [lightboxInitialIndex, setLightboxInitialIndex] = useState(0);
 
-  const handleOpenStoryLightbox = (story: WeddingStory, imageIndex: number = 0) => {
-    setLightboxStory(story);
+  // Active section scroll spy
+  useEffect(() => {
+    const sectionIds = ['hero', 'portfolio', 'films', 'services', 'about', 'contact'];
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 180;
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            setActiveSection(id);
+            break;
+          }
+        }
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleOpenLightbox = (story: StoryItem, imageIndex: number = 0) => {
+    setSelectedStory(story);
     setLightboxInitialIndex(imageIndex);
     setLightboxOpen(true);
   };
 
-  const handleOpenContactSheetLightbox = (index: number) => {
-    setLightboxStory(null); // uses CONTACT_SHEET_ITEMS
-    setLightboxInitialIndex(index);
-    setLightboxOpen(true);
-  };
-
   const handleScrollTo = (sectionId: string) => {
-    setActiveTab(sectionId);
+    setActiveSection(sectionId);
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      // Calculate top with responsive header offset so fixed header never covers section title
+      const yOffset = window.innerWidth < 640 ? -56 : -70;
+      const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#080808] text-[#F5F0E8] font-sans selection:bg-[#C6A477] selection:text-[#080808]">
-      {/* Top Fixed Navigation */}
+    <div className="min-h-screen bg-[#F7F5F0] text-[#68645E] font-sans selection:bg-[#A68B6A] selection:text-white">
+      {/* Top Fixed Navigation (3-Zone Contract) */}
       <Navigation
-        activeTab={activeTab}
-        setActiveTab={handleScrollTo}
-        onOpenCommission={() => setIsCommissionOpen(true)}
-        aspectRatio={aspectRatio}
-        setAspectRatio={setAspectRatio}
+        activeSection={activeSection}
+        onNavigate={handleScrollTo}
+        onOpenBooking={() => setIsBookingOpen(true)}
       />
 
       <main>
-        {/* Hero Section */}
+        {/* SECTION 01 – HERO */}
+        <HeroSection
+          onExploreStories={() => handleScrollTo('portfolio')}
+          onCheckDate={() => setIsBookingOpen(true)}
+        />
+
+        {/* SECTION 02 – TRUST INDICATORS */}
         <motion.div
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] as const }}
+          variants={sectionFadeIn}
+          initial="initial"
+          whileInView="whileInView"
+          viewport={sectionFadeIn.viewport}
+          transition={sectionFadeIn.transition}
         >
-          <HeroSection
-            onPlayFeatureReel={() => handleScrollTo('screening')}
-            onExploreArchives={() => handleScrollTo('showcase')}
-            onOpenCommission={() => setIsCommissionOpen(true)}
-            aspectRatio={aspectRatio}
-            onSelectHighlight={(coupleId) => {
-              const foundStory = STORIES.find((s) => s.id === coupleId);
-              if (foundStory) {
-                handleOpenStoryLightbox(foundStory, 0);
-              } else {
-                handleScrollTo('showcase');
-              }
-            }}
+          <TrustIndicators />
+        </motion.div>
+
+        {/* SECTION 03 – FEATURED WEDDING STORIES */}
+        <motion.div
+          variants={sectionFadeIn}
+          initial="initial"
+          whileInView="whileInView"
+          viewport={sectionFadeIn.viewport}
+          transition={sectionFadeIn.transition}
+        >
+          <FeaturedWeddingStories
+            onSelectStoryForLightbox={handleOpenLightbox}
           />
         </motion.div>
 
-        {/* Screening Room (Interactive Film Player) */}
+        {/* SECTION 04 – CINEMATIC FILMS */}
         <motion.div
-          variants={cinematicFadeIn}
+          variants={sectionFadeIn}
           initial="initial"
           whileInView="whileInView"
-          viewport={cinematicFadeIn.viewport}
-          transition={cinematicFadeIn.transition}
+          viewport={sectionFadeIn.viewport}
+          transition={sectionFadeIn.transition}
         >
-          <ScreeningRoom
-            aspectRatio={aspectRatio}
-            setAspectRatio={setAspectRatio}
-            onOpenCommission={() => setIsCommissionOpen(true)}
+          <CinematicFilmsSection />
+        </motion.div>
+
+        {/* SECTION 05 – PHOTOGRAPHY SERVICES */}
+        <motion.div
+          variants={sectionFadeIn}
+          initial="initial"
+          whileInView="whileInView"
+          viewport={sectionFadeIn.viewport}
+          transition={sectionFadeIn.transition}
+        >
+          <ServicesSection
+            onInquireService={() => setIsBookingOpen(true)}
           />
         </motion.div>
 
-        {/* Curated Editorial Stories Showcase */}
+        {/* SECTION 06 – OUR APPROACH (Warm Ivory Editorial Contrast) */}
         <motion.div
-          variants={cinematicFadeIn}
+          variants={sectionFadeIn}
           initial="initial"
           whileInView="whileInView"
-          viewport={cinematicFadeIn.viewport}
-          transition={cinematicFadeIn.transition}
+          viewport={sectionFadeIn.viewport}
+          transition={sectionFadeIn.transition}
         >
-          <EditorialShowcase
-            onSelectStoryForLightbox={handleOpenStoryLightbox}
-            onOpenCommission={() => setIsCommissionOpen(true)}
-          />
+          <OurApproachSection />
         </motion.div>
 
-        {/* Exhibition Gallery & 120mm Contact Sheet */}
+        {/* SECTION 07 – CLIENT TESTIMONIALS */}
         <motion.div
-          variants={cinematicFadeIn}
+          variants={sectionFadeIn}
           initial="initial"
           whileInView="whileInView"
-          viewport={cinematicFadeIn.viewport}
-          transition={cinematicFadeIn.transition}
+          viewport={sectionFadeIn.viewport}
+          transition={sectionFadeIn.transition}
         >
-          <ExhibitionGallerySection
-            onOpenLightboxWithContactSheet={handleOpenContactSheetLightbox}
-            onOpenCommission={() => setIsCommissionOpen(true)}
-          />
+          <TestimonialsSection />
         </motion.div>
 
-        {/* Vault, Optics & Philosophy */}
+        {/* SECTION 08 – FAQ */}
         <motion.div
-          variants={cinematicFadeIn}
+          variants={sectionFadeIn}
           initial="initial"
           whileInView="whileInView"
-          viewport={cinematicFadeIn.viewport}
-          transition={cinematicFadeIn.transition}
+          viewport={sectionFadeIn.viewport}
+          transition={sectionFadeIn.transition}
         >
-          <VaultAndPhilosophy />
+          <FAQSection />
+        </motion.div>
+
+        {/* SECTION 09 – FINAL BOOKING CTA */}
+        <motion.div
+          variants={sectionFadeIn}
+          initial="initial"
+          whileInView="whileInView"
+          viewport={sectionFadeIn.viewport}
+          transition={sectionFadeIn.transition}
+        >
+          <FinalBookingCTA
+            onOpenBooking={() => setIsBookingOpen(true)}
+          />
         </motion.div>
       </main>
 
-      {/* Footer */}
-      <motion.div
-        variants={cinematicFadeIn}
-        initial="initial"
-        whileInView="whileInView"
-        viewport={cinematicFadeIn.viewport}
-        transition={cinematicFadeIn.transition}
-      >
-        <ArchivalFooter
-          onOpenCommission={() => setIsCommissionOpen(true)}
-          onNavigate={handleScrollTo}
-        />
-      </motion.div>
+      {/* SECTION 10 – FOOTER */}
+      <ArchivalFooter
+        onOpenBooking={() => setIsBookingOpen(true)}
+        onNavigate={handleScrollTo}
+      />
 
-      {/* Fullscreen Darkroom Exhibition Lightbox */}
+      {/* Upgraded Fullscreen Photograph Lightbox */}
       <ExhibitionLightbox
         isOpen={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
-        activeStory={lightboxStory}
+        activeStory={selectedStory}
         initialIndex={lightboxInitialIndex}
       />
 
-      {/* Slide-in Client Commission Drawer */}
+      {/* Redesigned 3-Step Client Booking Drawer */}
       <ClientCommissionDrawer
-        isOpen={isCommissionOpen}
-        onClose={() => setIsCommissionOpen(false)}
+        isOpen={isBookingOpen}
+        onClose={() => setIsBookingOpen(false)}
       />
     </div>
   );

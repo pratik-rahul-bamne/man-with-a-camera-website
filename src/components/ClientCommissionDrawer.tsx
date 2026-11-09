@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Check, Calendar, Phone, MessageSquare, Send, Printer } from 'lucide-react';
+import { X, Check, Calendar, Phone, MessageSquare, Send, ArrowRight, ArrowLeft, AlertCircle } from 'lucide-react';
 import { BUSINESS_PROFILE } from '../data/weddingData';
 
 interface ClientCommissionDrawerProps {
@@ -7,510 +7,547 @@ interface ClientCommissionDrawerProps {
   onClose: () => void;
 }
 
+interface InquiryData {
+  coupleNames: string;
+  weddingDate: string;
+  destination: string;
+  eventType: string;
+  services: string[];
+  contactName: string;
+  phone: string;
+  email: string;
+  notes: string;
+}
+
 export const ClientCommissionDrawer: React.FC<ClientCommissionDrawerProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [currency, setCurrency] = useState<'INR' | 'USD' | 'EUR'>('INR');
-  const [days, setDays] = useState<number>(2);
-  const [destination, setDestination] = useState('Sangli & Kolhapur Region');
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [referenceCode, setReferenceCode] = useState<string | null>(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Add-ons
-  const [includeTeaserFilm, setIncludeTeaserFilm] = useState(true);
-  const [includeFullFilm, setIncludeFullFilm] = useState(true);
-  const [includeHeirloomAlbum, setIncludeHeirloomAlbum] = useState(true);
-  const [includeDroneAerial, setIncludeDroneAerial] = useState(true);
-  const [includePreWedding, setIncludePreWedding] = useState(false);
-
-  // Form Fields
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<InquiryData>({
     coupleNames: '',
-    email: '',
+    weddingDate: '',
+    destination: 'Sangli & Kolhapur Region',
+    eventType: 'Full Wedding Celebration',
+    services: ['Wedding Photography', 'Cinematic Wedding Films'],
+    contactName: '',
     phone: '',
-    weddingDate: '2026-12-15',
-    venue: '',
+    email: '',
     notes: '',
   });
 
-  const [submitted, setSubmitted] = useState(false);
-
   if (!isOpen) return null;
 
-  // Base pricing logic in INR
-  const baseRatePerDayINR = 75000;
-  const teaserCostINR = includeTeaserFilm ? 25000 : 0;
-  const fullFilmCostINR = includeFullFilm ? 40000 : 0;
-  const albumCostINR = includeHeirloomAlbum ? 35000 : 0;
-  const droneCostINR = includeDroneAerial ? 20000 : 0;
-  const preWeddingCostINR = includePreWedding ? 30000 : 0;
+  const eventTypes = [
+    'Full Wedding Celebration',
+    'Pre-Wedding Session',
+    'Multi-Day Royal Palace Wedding',
+    'Engagement Ceremony',
+    'Destination Wedding',
+  ];
 
-  const totalINR =
-    days * baseRatePerDayINR +
-    teaserCostINR +
-    fullFilmCostINR +
-    albumCostINR +
-    droneCostINR +
-    preWeddingCostINR;
-
-  const currencyRates = {
-    INR: { symbol: '₹', rate: 1 },
-    USD: { symbol: '$', rate: 1 / 84 },
-    EUR: { symbol: '€', rate: 1 / 92 },
-  };
-
-  const currentTotal = Math.round(totalINR * currencyRates[currency].rate);
-  const formattedTotal = new Intl.NumberFormat('en-IN').format(currentTotal);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-  };
-
-  const availableDestinations = [
+  const destinationOptions = [
     'Sangli & Kolhapur Region',
     'Mumbai & Suburban Metros',
     'Pune & Lonavala Resorts',
     'Goa Beach & Coastal Weddings',
-    'Udaipur & Rajasthan Palaces',
-    'Other Destination (India / Abroad)',
+    'Destination Wedding (Across India)',
+    'International Destination',
   ];
 
-  const calendarDates = [
-    { season: 'Winter 2026 (Nov - Jan)', slots: 'Limited Dates Available' },
-    { season: 'Spring 2027 (Feb - Apr)', slots: 'Bookings Open' },
-    { season: 'Summer 2027 (May - Jun)', slots: 'Destination Slots Open' },
-    { season: 'Autumn 2027 (Oct - Dec)', slots: 'Inquiries Welcome' },
+  const availableServices = [
+    'Wedding Photography',
+    'Cinematic Wedding Films',
+    'Pre-Wedding Photography',
+    'Handcrafted Heirloom Album',
+    '4K Drone Aerial Coverage',
   ];
 
-  const whatsappMessage = encodeURIComponent(
-    `Hello Man With A Camera,\n\nI would like to inquire about wedding coverage:\n- Couple: ${formData.coupleNames || 'Prospective Client'}\n- Date: ${formData.weddingDate}\n- Destination: ${destination}\n- Days: ${days} days\n- Estimated Investment: ${currencyRates[currency].symbol}${formattedTotal}\n- Notes: ${formData.notes || 'None'}\n\nPlease let me know your availability.`
+  const toggleService = (service: string) => {
+    setFormData((prev) => {
+      const exists = prev.services.includes(service);
+      const updated = exists
+        ? prev.services.filter((s) => s !== service)
+        : [...prev.services, service];
+      return { ...prev, services: updated };
+    });
+  };
+
+  const validateStep1 = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.coupleNames.trim()) {
+      newErrors.coupleNames = "Please enter the couple's names.";
+    }
+    if (!formData.weddingDate) {
+      newErrors.weddingDate = 'Please select your wedding date.';
+    }
+    if (formData.services.length === 0) {
+      newErrors.services = 'Please select at least one required service.';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep2 = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.contactName.trim()) {
+      newErrors.contactName = 'Please enter your full name.';
+    }
+    if (!formData.phone.trim() || formData.phone.length < 10) {
+      newErrors.phone = 'Please enter a valid 10-digit mobile number.';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNextStep1 = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateStep1()) {
+      setStep(2);
+    }
+  };
+
+  const handleNextStep2 = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateStep2()) {
+      setStep(3);
+    }
+  };
+
+  const handleFinalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Generate reference code ONLY when inquiry is actually submitted
+    const randomId = Math.floor(1000 + Math.random() * 9000);
+    const code = `MWAC-INQ-${new Date().getFullYear()}-${randomId}`;
+    setReferenceCode(code);
+    setIsSubmitted(true);
+  };
+
+  const formattedWhatsAppMsg = encodeURIComponent(
+    `Hello Man With A Camera,\n\nI would like to check availability for our wedding:\n- Couple: ${formData.coupleNames}\n- Date: ${formData.weddingDate}\n- Location: ${formData.destination}\n- Event Type: ${formData.eventType}\n- Services: ${formData.services.join(', ')}\n- Contact: ${formData.contactName} (${formData.phone})\n- Reference: ${referenceCode || 'New Website Inquiry'}\n\nCould you please let us know your calendar availability?`
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      {/* Dark backdrop */}
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="booking-drawer-title"
+      className="fixed inset-0 z-50 flex justify-end"
+    >
+      {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-[#080808]/85 backdrop-blur-md transition-opacity"
+        className="fixed inset-0 bg-[#252525]/60 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      {/* Slide-in panel */}
-      <div className="relative w-full max-w-2xl bg-[#101010] border-l border-[rgba(198,164,119,0.22)] h-full overflow-y-auto z-10 p-6 sm:p-10 text-[#F5F0E8] flex flex-col justify-between">
+      {/* Drawer Container */}
+      <div className="relative w-full max-w-xl bg-[#F7F5F0] border-l border-[#DDD8CF] h-full max-h-[100dvh] overflow-y-auto z-10 p-5 sm:p-8 md:p-10 text-[#252525] flex flex-col justify-between shadow-2xl">
         <div>
-          {/* Top Header */}
-          <div className="flex items-center justify-between pb-6 border-b border-[rgba(245,240,232,0.1)] mb-8">
+          {/* Header */}
+          <div className="flex items-center justify-between pb-5 sm:pb-6 border-b border-[#DDD8CF] mb-5 sm:mb-6">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="w-2 h-2 bg-[#C6A477]"></span>
-                <span className="text-[10px] tracking-[0.25em] text-[#C6A477] uppercase font-semibold">
-                  {BUSINESS_PROFILE.handle} · DIRECT DESK
-                </span>
-              </div>
-              <h2 className="font-serif text-2xl sm:text-3xl font-normal text-[#F5F0E8]">
-                Bookings &amp; Inquiries
+              <p className="text-[10px] tracking-[0.24em] text-[#A68B6A] uppercase font-semibold">
+                {BUSINESS_PROFILE.name} · Studio Booking
+              </p>
+              <h2 id="booking-drawer-title" className="font-serif text-xl sm:text-3xl text-[#252525] font-normal mt-1">
+                Check Availability
               </h2>
             </div>
 
             <button
               onClick={onClose}
-              className="p-2 border border-[rgba(245,240,232,0.15)] text-[#A6A19A] hover:text-[#080808] hover:bg-[#C6A477] transition-all cursor-pointer"
-              aria-label="Close Drawer"
+              className="p-2 border border-[#DDD8CF] text-[#68645E] hover:text-[#252525] hover:bg-[#EDEAE3] transition-all cursor-pointer rounded-sm"
+              aria-label="Close Booking Drawer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {!submitted ? (
-            <div className="space-y-8">
-              {/* Direct Call / WhatsApp Quick Banner */}
-              <div className="bg-[#080808] p-4 border border-[rgba(198,164,119,0.22)] flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <p className="text-[10px] tracking-[0.22em] text-[#C6A477] uppercase font-semibold">
-                    DIRECT CALL / WHATSAPP BOOKING
-                  </p>
-                  <p className="text-sm font-mono text-[#F5F0E8] mt-0.5">
-                    {BUSINESS_PROFILE.formattedPhone}
-                  </p>
-                  <p className="text-[10px] text-[#A6A19A] mt-0.5">
-                    Sangli | Mumbai | Destination Weddings
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <a
-                    href={`tel:${BUSINESS_PROFILE.phone}`}
-                    className="p-2 border border-[rgba(245,240,232,0.2)] hover:border-[#C6A477] text-[#C6A477] flex items-center gap-1.5 text-xs transition-colors"
-                  >
-                    <Phone className="w-3.5 h-3.5" />
-                    <span>CALL</span>
-                  </a>
-
-                  <a
-                    href={BUSINESS_PROFILE.whatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-[#C6A477] text-[#080808] hover:bg-[#F5F0E8] px-3 py-2 text-xs font-semibold uppercase flex items-center gap-1.5 transition-colors"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    <span>WHATSAPP</span>
-                  </a>
-                </div>
-              </div>
-
-              {/* Season Availability */}
-              <div className="bg-[#141414] p-4 border border-[rgba(245,240,232,0.08)]">
-                <div className="flex items-center justify-between text-[10px] tracking-[0.22em] text-[#C6A477] uppercase font-semibold mb-2">
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5" />
-                    WEDDING SEASON CALENDAR
+          {!isSubmitted ? (
+            <div>
+              {/* Step Progress Indicator */}
+              <div className="mb-6 sm:mb-8">
+                <div className="flex items-center justify-between text-[11px] sm:text-xs tracking-[0.12em] sm:tracking-[0.16em] uppercase font-medium text-[#68645E] mb-2">
+                  <span className={step >= 1 ? 'text-[#252525] font-semibold' : ''}>
+                    1. <span className="hidden xs:inline">Wedding </span>Details
                   </span>
-                  <span className="text-emerald-400">SINCE 2014</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  {calendarDates.map((item, i) => (
-                    <div key={i} className="bg-[#080808] p-2 border border-[rgba(245,240,232,0.06)]">
-                      <p className="text-[#F5F0E8] font-medium">{item.season}</p>
-                      <p className="text-[10px] text-[#A6A19A] mt-0.5">{item.slots}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Package Calculator Section */}
-              <div className="bg-[#141414] p-5 border border-[rgba(198,164,119,0.18)]">
-                <div className="flex items-center justify-between pb-3 border-b border-[rgba(245,240,232,0.1)] mb-4">
-                  <span className="text-[10px] tracking-[0.24em] text-[#C6A477] uppercase font-semibold">
-                    PACKAGE CALCULATOR
+                  <span className={step >= 2 ? 'text-[#252525] font-semibold' : ''}>
+                    2. Contact
                   </span>
-
-                  {/* Currency Toggle */}
-                  <div className="flex items-center border border-[rgba(245,240,232,0.15)] text-[9px] tracking-[0.18em]">
-                    {(['INR', 'USD', 'EUR'] as const).map((curr) => (
-                      <button
-                        key={curr}
-                        type="button"
-                        onClick={() => setCurrency(curr)}
-                        className={`px-2 py-1 uppercase cursor-pointer ${
-                          currency === curr
-                            ? 'bg-[#C6A477] text-[#080808] font-bold'
-                            : 'text-[#A6A19A] hover:text-[#F5F0E8]'
-                        }`}
-                      >
-                        {curr}
-                      </button>
-                    ))}
-                  </div>
+                  <span className={step === 3 ? 'text-[#252525] font-semibold' : ''}>
+                    3. Review
+                  </span>
                 </div>
-
-                {/* Days Slider */}
-                <div className="mb-5">
-                  <div className="flex justify-between items-center text-xs mb-2">
-                    <span className="text-[#A6A19A] uppercase tracking-[0.18em]">WEDDING DURATION</span>
-                    <span className="text-[#F5F0E8] font-serif text-sm font-semibold">{days} Day Coverage</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="1"
-                    max="4"
-                    step="1"
-                    value={days}
-                    onChange={(e) => setDays(Number(e.target.value))}
-                    className="w-full accent-[#C6A477] cursor-pointer"
-                  />
-                  <div className="flex justify-between text-[9px] text-[#A6A19A] mt-1">
-                    <span>1-Day Wedding</span>
-                    <span>2-Day Traditional</span>
-                    <span>3-Day Royal</span>
-                    <span>4-Day Destination</span>
-                  </div>
-                </div>
-
-                {/* Service Inclusions */}
-                <div className="space-y-3 pt-3 border-t border-[rgba(245,240,232,0.06)]">
-                  <label className="flex items-center justify-between text-xs cursor-pointer group">
-                    <div className="flex items-center gap-3">
-                      <div
-                        onClick={() => setIncludeTeaserFilm(!includeTeaserFilm)}
-                        className={`w-3.5 h-3.5 border transition-all flex items-center justify-center ${
-                          includeTeaserFilm
-                            ? 'border-[#C6A477] bg-[#C6A477] text-[#080808]'
-                            : 'border-[rgba(245,240,232,0.3)] bg-transparent'
-                        }`}
-                      >
-                        {includeTeaserFilm && <Check className="w-3 h-3 stroke-[3]" />}
-                      </div>
-                      <span className="text-[#F5F0E8] group-hover:text-[#C6A477] transition-colors">
-                        Cinematic Wedding Teaser (1–3 Minutes for Instagram &amp; Family)
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-[#A6A19A] font-mono">+ Included</span>
-                  </label>
-
-                  <label className="flex items-center justify-between text-xs cursor-pointer group">
-                    <div className="flex items-center gap-3">
-                      <div
-                        onClick={() => setIncludeFullFilm(!includeFullFilm)}
-                        className={`w-3.5 h-3.5 border transition-all flex items-center justify-center ${
-                          includeFullFilm
-                            ? 'border-[#C6A477] bg-[#C6A477] text-[#080808]'
-                            : 'border-[rgba(245,240,232,0.3)] bg-transparent'
-                        }`}
-                      >
-                        {includeFullFilm && <Check className="w-3 h-3 stroke-[3]" />}
-                      </div>
-                      <span className="text-[#F5F0E8] group-hover:text-[#C6A477] transition-colors">
-                        Full Traditional Documentary Feature Film (20–45 Minutes)
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-[#A6A19A] font-mono">+ Included</span>
-                  </label>
-
-                  <label className="flex items-center justify-between text-xs cursor-pointer group">
-                    <div className="flex items-center gap-3">
-                      <div
-                        onClick={() => setIncludeHeirloomAlbum(!includeHeirloomAlbum)}
-                        className={`w-3.5 h-3.5 border transition-all flex items-center justify-center ${
-                          includeHeirloomAlbum
-                            ? 'border-[#C6A477] bg-[#C6A477] text-[#080808]'
-                            : 'border-[rgba(245,240,232,0.3)] bg-transparent'
-                        }`}
-                      >
-                        {includeHeirloomAlbum && <Check className="w-3 h-3 stroke-[3]" />}
-                      </div>
-                      <span className="text-[#F5F0E8] group-hover:text-[#C6A477] transition-colors">
-                        Premium Handcrafted Heirloom Photo Album (Canvera Silk / Leather)
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-[#A6A19A] font-mono">+ Included</span>
-                  </label>
-
-                  <label className="flex items-center justify-between text-xs cursor-pointer group">
-                    <div className="flex items-center gap-3">
-                      <div
-                        onClick={() => setIncludeDroneAerial(!includeDroneAerial)}
-                        className={`w-3.5 h-3.5 border transition-all flex items-center justify-center ${
-                          includeDroneAerial
-                            ? 'border-[#C6A477] bg-[#C6A477] text-[#080808]'
-                            : 'border-[rgba(245,240,232,0.3)] bg-transparent'
-                        }`}
-                      >
-                        {includeDroneAerial && <Check className="w-3 h-3 stroke-[3]" />}
-                      </div>
-                      <span className="text-[#F5F0E8] group-hover:text-[#C6A477] transition-colors">
-                        4K Drone Aerial Mandap &amp; Baraat Coverage
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-[#A6A19A] font-mono">+ Included</span>
-                  </label>
-
-                  <label className="flex items-center justify-between text-xs cursor-pointer group">
-                    <div className="flex items-center gap-3">
-                      <div
-                        onClick={() => setIncludePreWedding(!includePreWedding)}
-                        className={`w-3.5 h-3.5 border transition-all flex items-center justify-center ${
-                          includePreWedding
-                            ? 'border-[#C6A477] bg-[#C6A477] text-[#080808]'
-                            : 'border-[rgba(245,240,232,0.3)] bg-transparent'
-                        }`}
-                      >
-                        {includePreWedding && <Check className="w-3 h-3 stroke-[3]" />}
-                      </div>
-                      <span className="text-[#F5F0E8] group-hover:text-[#C6A477] transition-colors">
-                        Scenic Pre-Wedding Shoot (Sangli / Mumbai / Escapes)
-                      </span>
-                    </div>
-                    <span className="text-[10px] text-[#A6A19A] font-mono">+ Optional</span>
-                  </label>
-                </div>
-
-                {/* Total Investment Display */}
-                <div className="mt-6 pt-4 border-t border-[rgba(198,164,119,0.22)] flex items-end justify-between">
-                  <div>
-                    <span className="text-[9px] tracking-[0.2em] text-[#A6A19A] uppercase block">
-                      ESTIMATED INVESTMENT
-                    </span>
-                    <span className="text-[10px] text-[#C6A477] font-light">
-                      Senior Cinematographers &amp; Color Grading
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-serif text-2xl sm:text-3xl text-[#C6A477] font-semibold">
-                      {currencyRates[currency].symbol}
-                      {formattedTotal}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Inquiry Form */}
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label className="text-[10px] tracking-[0.22em] text-[#C6A477] uppercase block mb-1">
-                    COUPLE NAMES *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Akash & Pooja"
-                    value={formData.coupleNames}
-                    onChange={(e) => setFormData({ ...formData, coupleNames: e.target.value })}
-                    className="w-full bg-transparent border-b border-[rgba(245,240,232,0.2)] focus:border-[#C6A477] py-2 text-sm text-[#F5F0E8] outline-none transition-colors placeholder:text-[#A6A19A]/40"
+                <div className="w-full bg-[#EDEAE3] h-1.5 rounded-full overflow-hidden">
+                  <div
+                    className="bg-[#252525] h-full transition-all duration-300"
+                    style={{ width: `${(step / 3) * 100}%` }}
                   />
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {/* STEP 1: WEDDING DETAILS */}
+              {step === 1 && (
+                <form onSubmit={handleNextStep1} className="space-y-5 sm:space-y-6">
                   <div>
-                    <label className="text-[10px] tracking-[0.22em] text-[#C6A477] uppercase block mb-1">
-                      WHATSAPP / PHONE NUMBER *
+                    <label className="text-xs tracking-[0.18em] uppercase text-[#252525] font-semibold block mb-2">
+                      Couple's Names *
                     </label>
                     <input
-                      type="tel"
-                      required
-                      placeholder="9766066092"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full bg-transparent border-b border-[rgba(245,240,232,0.2)] focus:border-[#C6A477] py-2 text-sm text-[#F5F0E8] outline-none transition-colors placeholder:text-[#A6A19A]/40"
+                      type="text"
+                      placeholder="e.g. Akash & Pooja"
+                      value={formData.coupleNames}
+                      onChange={(e) => setFormData({ ...formData, coupleNames: e.target.value })}
+                      className="w-full min-h-[46px] bg-[#EDEAE3] border border-[#DDD8CF] focus:border-[#252525] focus:bg-[#FFFFFF] px-4 py-3 text-base sm:text-sm text-[#252525] outline-none rounded-sm transition-colors placeholder:text-[#68645E]/50"
                     />
-                  </div>
-                  <div>
-                    <label className="text-[10px] tracking-[0.22em] text-[#C6A477] uppercase block mb-1">
-                      EMAIL ADDRESS
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="client@gmail.com"
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-transparent border-b border-[rgba(245,240,232,0.2)] focus:border-[#C6A477] py-2 text-sm text-[#F5F0E8] outline-none transition-colors placeholder:text-[#A6A19A]/40"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <label className="text-[10px] tracking-[0.22em] text-[#C6A477] uppercase block mb-1">
-                      WEDDING DATE
-                    </label>
-                    <input
-                      type="date"
-                      value={formData.weddingDate}
-                      onChange={(e) => setFormData({ ...formData, weddingDate: e.target.value })}
-                      className="w-full bg-transparent border-b border-[rgba(245,240,232,0.2)] focus:border-[#C6A477] py-2 text-sm text-[#F5F0E8] outline-none transition-colors"
-                    />
+                    {errors.coupleNames && (
+                      <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1 font-medium">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        <span>{errors.coupleNames}</span>
+                      </p>
+                    )}
                   </div>
 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs tracking-[0.18em] uppercase text-[#252525] font-semibold block mb-2">
+                        Wedding Date *
+                      </label>
+                      <input
+                        type="date"
+                        value={formData.weddingDate}
+                        onChange={(e) => setFormData({ ...formData, weddingDate: e.target.value })}
+                        className="w-full min-h-[46px] bg-[#EDEAE3] border border-[#DDD8CF] focus:border-[#252525] focus:bg-[#FFFFFF] px-4 py-3 text-base sm:text-sm text-[#252525] outline-none rounded-sm transition-colors"
+                      />
+                      {errors.weddingDate && (
+                        <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1 font-medium">
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          <span>{errors.weddingDate}</span>
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="text-xs tracking-[0.18em] uppercase text-[#252525] font-semibold block mb-2">
+                        Event Type
+                      </label>
+                      <select
+                        value={formData.eventType}
+                        onChange={(e) => setFormData({ ...formData, eventType: e.target.value })}
+                        className="w-full min-h-[46px] bg-[#EDEAE3] border border-[#DDD8CF] focus:border-[#252525] focus:bg-[#FFFFFF] px-4 py-3 text-base sm:text-sm text-[#252525] outline-none rounded-sm transition-colors"
+                      >
+                        {eventTypes.map((type) => (
+                          <option key={type} value={type} className="bg-[#FFFFFF] text-[#252525]">
+                            {type}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="text-[10px] tracking-[0.22em] text-[#C6A477] uppercase block mb-1">
-                      WEDDING DESTINATION
+                    <label className="text-xs tracking-[0.18em] uppercase text-[#252525] font-semibold block mb-2">
+                      Wedding Location / Destination
                     </label>
                     <select
-                      value={destination}
-                      onChange={(e) => setDestination(e.target.value)}
-                      className="w-full bg-[#101010] border-b border-[rgba(245,240,232,0.2)] focus:border-[#C6A477] py-2 text-sm text-[#F5F0E8] outline-none transition-colors"
+                      value={formData.destination}
+                      onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
+                      className="w-full bg-[#EDEAE3] border border-[#DDD8CF] focus:border-[#252525] focus:bg-[#FFFFFF] px-4 py-3 text-sm text-[#252525] outline-none rounded-sm transition-colors"
                     >
-                      {availableDestinations.map((d) => (
-                        <option key={d} value={d} className="bg-[#101010] text-[#F5F0E8]">
-                          {d}
+                      {destinationOptions.map((opt) => (
+                        <option key={opt} value={opt} className="bg-[#FFFFFF] text-[#252525]">
+                          {opt}
                         </option>
                       ))}
                     </select>
                   </div>
-                </div>
 
-                <div>
-                  <label className="text-[10px] tracking-[0.22em] text-[#C6A477] uppercase block mb-1">
-                    VENUE DETAILS OR CEREMONY WISHES
-                  </label>
-                  <textarea
-                    rows={3}
-                    placeholder="Tell us about your wedding events, haldi, sangeet, or rituals..."
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="w-full bg-transparent border-b border-[rgba(245,240,232,0.2)] focus:border-[#C6A477] py-2 text-sm text-[#F5F0E8] outline-none transition-colors placeholder:text-[#A6A19A]/40 resize-none"
-                  />
-                </div>
+                  <div>
+                    <label className="text-xs tracking-[0.18em] uppercase text-[#252525] font-semibold block mb-2">
+                      Required Services *
+                    </label>
+                    <div className="space-y-2.5">
+                      {availableServices.map((service) => {
+                        const isChecked = formData.services.includes(service);
+                        return (
+                          <div
+                            key={service}
+                            onClick={() => toggleService(service)}
+                            className="flex items-center gap-3 p-3 bg-[#EDEAE3] border border-[#DDD8CF] hover:border-[#A68B6A] cursor-pointer rounded-sm transition-colors"
+                          >
+                            <div
+                              className={`w-4 h-4 border flex items-center justify-center rounded-sm transition-colors ${
+                                isChecked
+                                  ? 'border-[#252525] bg-[#252525] text-[#FFFFFF]'
+                                  : 'border-[#DDD8CF] bg-[#F7F5F0]'
+                              }`}
+                            >
+                              {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                            </div>
+                            <span className="text-xs text-[#252525] font-medium">{service}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {errors.services && (
+                      <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1 font-medium">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        <span>{errors.services}</span>
+                      </p>
+                    )}
+                  </div>
 
-                <button
-                  type="submit"
-                  className="w-full bg-[#C6A477] text-[#080808] hover:bg-[#F5F0E8] py-3.5 text-[11px] tracking-[0.25em] font-semibold uppercase transition-all duration-300 gold-halo flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>TRANSMIT BOOKING INQUIRY</span>
-                </button>
-              </form>
+                  <button
+                    type="submit"
+                    className="w-full bg-[#252525] text-[#FFFFFF] hover:bg-[#A68B6A] py-3.5 text-xs tracking-[0.2em] font-semibold uppercase transition-all rounded-sm flex items-center justify-center gap-2 cursor-pointer mt-6 shadow-sm"
+                  >
+                    <span>Proceed to Contact Details</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </form>
+              )}
+
+              {/* STEP 2: CONTACT DETAILS */}
+              {step === 2 && (
+                <form onSubmit={handleNextStep2} className="space-y-5 sm:space-y-6">
+                  <div>
+                    <label className="text-xs tracking-[0.18em] uppercase text-[#252525] font-semibold block mb-2">
+                      Your Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Akash Deshmukh"
+                      value={formData.contactName}
+                      onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
+                      className="w-full min-h-[46px] bg-[#EDEAE3] border border-[#DDD8CF] focus:border-[#252525] focus:bg-[#FFFFFF] px-4 py-3 text-base sm:text-sm text-[#252525] outline-none rounded-sm transition-colors placeholder:text-[#68645E]/50"
+                    />
+                    {errors.contactName && (
+                      <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1 font-medium">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        <span>{errors.contactName}</span>
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs tracking-[0.18em] uppercase text-[#252525] font-semibold block mb-2">
+                        Mobile Number (WhatsApp) *
+                      </label>
+                      <input
+                        type="tel"
+                        placeholder="9766066092"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="w-full min-h-[46px] bg-[#EDEAE3] border border-[#DDD8CF] focus:border-[#252525] focus:bg-[#FFFFFF] px-4 py-3 text-base sm:text-sm text-[#252525] outline-none rounded-sm transition-colors placeholder:text-[#68645E]/50 font-mono"
+                      />
+                      {errors.phone && (
+                        <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1 font-medium">
+                          <AlertCircle className="w-3.5 h-3.5" />
+                          <span>{errors.phone}</span>
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="text-xs tracking-[0.18em] uppercase text-[#252525] font-semibold block mb-2">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        placeholder="client@gmail.com"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="w-full min-h-[46px] bg-[#EDEAE3] border border-[#DDD8CF] focus:border-[#252525] focus:bg-[#FFFFFF] px-4 py-3 text-base sm:text-sm text-[#252525] outline-none rounded-sm transition-colors placeholder:text-[#68645E]/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs tracking-[0.18em] uppercase text-[#252525] font-semibold block mb-2">
+                      Venue Details or Specific Desires
+                    </label>
+                    <textarea
+                      rows={3}
+                      placeholder="Tell us about the venue, rituals, or any special moments you want us to capture..."
+                      value={formData.notes}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                      className="w-full bg-[#EDEAE3] border border-[#DDD8CF] focus:border-[#252525] focus:bg-[#FFFFFF] px-4 py-3 text-base sm:text-sm text-[#252525] outline-none rounded-sm transition-colors placeholder:text-[#68645E]/50 resize-none"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-4 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="border border-[#DDD8CF] text-[#68645E] hover:text-[#252525] hover:bg-[#EDEAE3] px-5 py-3 text-xs tracking-[0.18em] uppercase font-semibold rounded-sm transition-colors flex items-center gap-2 cursor-pointer"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>Back</span>
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="flex-1 bg-[#252525] text-[#FFFFFF] hover:bg-[#A68B6A] py-3 text-xs tracking-[0.2em] font-semibold uppercase transition-all rounded-sm flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                    >
+                      <span>Review Details</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* STEP 3: REVIEW & SUBMIT */}
+              {step === 3 && (
+                <form onSubmit={handleFinalSubmit} className="space-y-6">
+                  <div className="bg-[#EDEAE3] p-5 border border-[#DDD8CF] space-y-4 text-xs font-sans rounded-sm">
+                    <div className="flex items-center justify-between pb-3 border-b border-[#DDD8CF]">
+                      <span className="text-[10px] tracking-[0.2em] text-[#A68B6A] uppercase font-semibold">
+                        Inquiry Summary
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                        className="text-[#A68B6A] hover:text-[#252525] uppercase text-[10px] tracking-wider font-semibold"
+                      >
+                        Edit Details
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <span className="text-[#68645E] block text-[10px] uppercase tracking-wider">Couple</span>
+                        <span className="text-[#252525] font-medium mt-0.5 block">{formData.coupleNames}</span>
+                      </div>
+                      <div>
+                        <span className="text-[#68645E] block text-[10px] uppercase tracking-wider">Wedding Date</span>
+                        <span className="text-[#252525] font-medium mt-0.5 block">{formData.weddingDate}</span>
+                      </div>
+                      <div>
+                        <span className="text-[#68645E] block text-[10px] uppercase tracking-wider">Location</span>
+                        <span className="text-[#252525] font-medium mt-0.5 block">{formData.destination}</span>
+                      </div>
+                      <div>
+                        <span className="text-[#68645E] block text-[10px] uppercase tracking-wider">Event Type</span>
+                        <span className="text-[#252525] font-medium mt-0.5 block">{formData.eventType}</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-[#DDD8CF]">
+                      <span className="text-[#68645E] block text-[10px] uppercase tracking-wider mb-1">Services</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {formData.services.map((s) => (
+                          <span key={s} className="bg-[#F7F5F0] text-[#252525] px-2 py-0.5 border border-[#DDD8CF] text-[10px] font-medium rounded-sm">
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-[#DDD8CF] grid grid-cols-2 gap-3">
+                      <div>
+                        <span className="text-[#68645E] block text-[10px] uppercase tracking-wider">Contact Person</span>
+                        <span className="text-[#252525] font-medium mt-0.5 block">{formData.contactName}</span>
+                      </div>
+                      <div>
+                        <span className="text-[#68645E] block text-[10px] uppercase tracking-wider">Mobile Number</span>
+                        <span className="text-[#252525] font-mono mt-0.5 block">{formData.phone}</span>
+                      </div>
+                    </div>
+
+                    {formData.notes && (
+                      <div className="pt-2 border-t border-[#DDD8CF]">
+                        <span className="text-[#68645E] block text-[10px] uppercase tracking-wider mb-0.5">Notes</span>
+                        <span className="text-[#252525] font-light text-xs italic">"{formData.notes}"</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <p className="text-[11px] text-[#68645E] leading-relaxed">
+                    * Submitting this form creates a priority inquiry to check our studio schedule. This does not commit you or charge any advance until availability is confirmed.
+                  </p>
+
+                  <div className="flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setStep(2)}
+                      className="border border-[#DDD8CF] text-[#68645E] hover:text-[#252525] hover:bg-[#EDEAE3] px-5 py-3.5 text-xs tracking-[0.18em] uppercase font-semibold rounded-sm transition-colors flex items-center gap-2 cursor-pointer"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      <span>Back</span>
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="flex-1 bg-[#252525] text-[#FFFFFF] hover:bg-[#A68B6A] py-3.5 text-xs tracking-[0.2em] font-semibold uppercase transition-all rounded-sm flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span>Submit Wedding Inquiry</span>
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
           ) : (
-            /* Submission Dossier Preview */
-            <div className="bg-[#080808] border border-[#C6A477] p-6 space-y-6">
-              <div className="flex items-center gap-2 text-[#C6A477]">
-                <Check className="w-5 h-5" />
-                <span className="text-[11px] tracking-[0.25em] font-semibold uppercase">
-                  INQUIRY GENERATED · MAN WITH A CAMERA
+            /* Submission Confirmation */
+            <div className="bg-[#EDEAE3] border border-[#DDD8CF] p-6 sm:p-8 space-y-6 animate-in fade-in duration-300 shadow-xl rounded-sm">
+              <div className="flex items-center gap-2 text-[#A68B6A]">
+                <Check className="w-5 h-5 stroke-[2.5]" />
+                <span className="text-xs tracking-[0.22em] font-semibold uppercase">
+                  Inquiry Received Successfully
                 </span>
               </div>
 
-              <h3 className="font-serif text-2xl text-[#F5F0E8]">
-                Namaste, {formData.coupleNames || 'Dear Patrons'}!
-              </h3>
-
-              <p className="text-sm text-[#A6A19A] leading-relaxed">
-                Thank you for considering {BUSINESS_PROFILE.name}. We will review date availability for {destination} and connect with you on WhatsApp/Phone ({formData.phone || BUSINESS_PROFILE.formattedPhone}).
-              </p>
-
-              <div className="bg-[#141414] p-4 border border-[rgba(245,240,232,0.08)] space-y-2 text-xs font-mono">
-                <div className="flex justify-between">
-                  <span className="text-[#A6A19A]">REF NO:</span>
-                  <span className="text-[#C6A477]">MWAC-{(Math.random() * 9000 + 1000).toFixed(0)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#A6A19A]">DESTINATION:</span>
-                  <span className="text-[#F5F0E8]">{destination}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#A6A19A]">ESTIMATE:</span>
-                  <span className="text-[#C6A477] font-semibold">
-                    {currencyRates[currency].symbol}
-                    {formattedTotal}
-                  </span>
-                </div>
+              <div>
+                <h3 className="font-serif text-2xl text-[#252525]">
+                  Thank you, {formData.contactName}!
+                </h3>
+                <p className="text-xs text-[#68645E] font-light mt-2 leading-relaxed">
+                  We have logged your inquiry for <strong className="text-[#252525]">{formData.coupleNames}</strong> on <strong className="text-[#252525]">{formData.weddingDate}</strong> in <strong className="text-[#252525]">{formData.destination}</strong>.
+                </p>
               </div>
 
-              <div className="space-y-3">
+              {/* Distinction reminder */}
+              <div className="bg-[#F7F5F0] p-4 border border-[#DDD8CF] text-xs text-[#68645E] space-y-2 rounded-sm">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span>INQUIRY REF:</span>
+                  <span className="text-[#A68B6A] font-semibold">{referenceCode}</span>
+                </div>
+                <p className="text-[11px] text-[#68645E] pt-1">
+                  <strong className="text-[#252525]">Notice:</strong> This is a booking inquiry, not a confirmed reservation. We will review our availability and connect with you on WhatsApp/Phone ({formData.phone}) within 24 hours.
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-2">
                 <a
-                  href={`https://wa.me/919766066092?text=${whatsappMessage}`}
+                  href={`https://wa.me/919766066092?text=${formattedWhatsAppMsg}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full bg-[#C6A477] text-[#080808] hover:bg-[#F5F0E8] py-3 text-[11px] tracking-[0.22em] font-semibold uppercase transition-all flex items-center justify-center gap-2"
+                  className="w-full bg-[#252525] text-[#FFFFFF] hover:bg-[#A68B6A] py-3 text-xs tracking-[0.2em] font-semibold uppercase transition-all rounded-sm flex items-center justify-center gap-2 shadow-sm"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>FORWARD INQUIRY ON WHATSAPP (+91 9766066092)</span>
+                  <span>Forward Details on WhatsApp</span>
                 </a>
 
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => window.print()}
-                    className="flex-1 border border-[rgba(198,164,119,0.4)] text-[#F5F0E8] hover:bg-[#C6A477]/10 py-2.5 text-[10px] tracking-[0.2em] uppercase font-semibold flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <Printer className="w-3.5 h-3.5" />
-                    <span>PRINT DOSSIER</span>
-                  </button>
-
-                  <button
-                    onClick={() => setSubmitted(false)}
-                    className="border border-[rgba(245,240,232,0.15)] text-[#A6A19A] hover:text-[#F5F0E8] py-2.5 px-4 text-[10px] tracking-[0.2em] uppercase cursor-pointer"
-                  >
-                    EDIT
-                  </button>
-                </div>
+                <button
+                  onClick={onClose}
+                  className="w-full border border-[#DDD8CF] text-[#68645E] hover:text-[#252525] hover:bg-[#F7F5F0] py-2.5 text-xs tracking-[0.18em] uppercase rounded-sm cursor-pointer"
+                >
+                  Close Window
+                </button>
               </div>
             </div>
           )}
         </div>
 
-        {/* Bottom studio guarantee */}
-        <div className="pt-6 mt-8 border-t border-[rgba(245,240,232,0.08)] text-[10px] tracking-[0.18em] text-[#A6A19A] uppercase flex items-center justify-between">
-          <span>CAPTURING TIMELESS LOVE STORIES SINCE {BUSINESS_PROFILE.foundedYear}</span>
-          <span className="text-[#C6A477]">SANGLI · MUMBAI</span>
+        {/* Footer info */}
+        <div className="pt-6 mt-6 border-t border-[#DDD8CF] flex items-center justify-between text-[11px] text-[#68645E]">
+          <span>Studio: {BUSINESS_PROFILE.formattedPhone}</span>
+          <span>Sangli · Mumbai</span>
         </div>
       </div>
     </div>

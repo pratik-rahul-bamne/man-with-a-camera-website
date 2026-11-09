@@ -1,37 +1,3 @@
-export interface WeddingStory {
-  id: string;
-  couple: string;
-  locations: string[];
-  year: string;
-  chapterTag: string;
-  tagline: string;
-  heroImage: string;
-  aspectRatio: string;
-  exif: {
-    camera: string;
-    lens: string;
-    focalLength: string;
-    aperture: string;
-    iso: string;
-    lut: string;
-  };
-  chapters: {
-    title: string;
-    timestamp: string;
-    description: string;
-    image: string;
-  }[];
-  synopsis: string;
-  quote: string;
-  gallery: {
-    url: string;
-    caption: string;
-    lens: string;
-    orientation: 'landscape' | 'portrait' | 'square';
-    filmStock: string;
-  }[];
-}
-
 export interface BusinessProfile {
   name: string;
   handle: string;
@@ -45,9 +11,69 @@ export interface BusinessProfile {
   instagramUrl: string;
   youtubeUrl: string;
   postsCount: string;
-  followersCount: string;
-  followingCount: string;
   manifestoQuote: string;
+}
+
+
+export interface TrustMetric {
+  value: string;
+  label: string;
+  description: string;
+}
+
+export interface ServiceItem {
+  id: string;
+  title: string;
+  category: string;
+  summary: string;
+  deliverables: string[];
+  featuredImage: string;
+}
+
+export interface StoryItem {
+  id: string;
+  couple: string;
+  title: string;
+  category: 'Traditional Weddings' | 'Pre-Wedding' | 'Candid Moments' | 'Wedding Films';
+  location: string;
+  year: string;
+  heroImage: string;
+  aspectRatio: string;
+  caption: string;
+  galleryImages: {
+    url: string;
+    caption: string;
+  }[];
+}
+
+export interface CinematicFilm {
+  id: string;
+  title: string;
+  couple: string;
+  location: string;
+  duration: string;
+  aspectRatio: string;
+  videoUrl: string;
+  posterUrl: string;
+  scoreDescription: string;
+}
+
+export interface ApproachPillar {
+  number: string;
+  title: string;
+  description: string;
+}
+
+export interface TestimonialItem {
+  quote: string;
+  couple: string;
+  venue: string;
+  year: string;
+}
+
+export interface FAQItem {
+  question: string;
+  answer: string;
 }
 
 export const BUSINESS_PROFILE: BusinessProfile = {
@@ -63,267 +89,247 @@ export const BUSINESS_PROFILE: BusinessProfile = {
   instagramUrl: 'https://instagram.com/manwitha_camera',
   youtubeUrl: 'https://www.youtube.com/channel/UC217RoGmgFjK7PSRiIQUBmg',
   postsCount: '118+',
-  followersCount: '5.3K+',
-  followingCount: '828',
   manifestoQuote: 'more than love — we loved with a love that was more than love',
 };
 
-export const STORY_HIGHLIGHTS = [
+export const TRUST_METRICS: TrustMetric[] = [
   {
-    id: 'akash-pooja',
-    couple: 'Akash // Pooja',
-    label: 'Akash // Pooja',
-    image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=400&q=80',
-    location: 'Sangli Heritage Royal Paithani',
+    value: '10+',
+    label: 'Years of Craft',
+    description: 'Documenting heartfelt celebrations & sacred rituals since 2014.',
   },
   {
-    id: 'umesh-pooja',
-    couple: 'UMESH // POOJA',
-    label: 'UMESH // PO...',
-    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=400&q=80',
-    location: 'Minimalist Scenic Vows',
+    value: '118+',
+    label: 'Weddings & Films',
+    description: 'Bespoke love stories preserved across Maharashtra and India.',
   },
   {
-    id: 'akshay-arti',
-    couple: 'Akshay // Arti',
-    label: 'Akshay // Arti',
-    image: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=400&q=80',
-    location: 'Temple Courtyard & Zardozi',
+    value: '2 Bases',
+    label: 'Sangli & Mumbai',
+    description: 'Rooted local presence with worldwide destination availability.',
   },
   {
-    id: 'abhi-rituja',
-    couple: 'Abhi // Rituja',
-    label: 'Abhi // Rituja',
-    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=400&q=80',
-    location: 'Monochrome Editorial & Sangeet',
-  },
-  {
-    id: 'suraj-anita',
-    couple: 'Suraj // Anita',
-    label: 'Suraj // Anita',
-    image: 'https://images.unsplash.com/photo-1519225429980-715cb0215aed?auto=format&fit=crop&w=400&q=80',
-    location: 'Sunset Phere & Vineyards',
-  },
-  {
-    id: 'nikhil-smita',
-    couple: 'Nikhil // Smita',
-    label: 'Nikhil // Smita',
-    image: 'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=400&q=80',
-    location: 'Emerald Silk & Royal Mandap',
-  },
-  {
-    id: 'aniket-dhanashree',
-    couple: 'Aniket // Dhanashree',
-    label: 'Aniket // Dha...',
-    image: 'https://images.unsplash.com/photo-1544077960-604201fe74bc?auto=format&fit=crop&w=400&q=80',
-    location: 'Candid Haldi & Sunset Gala',
+    value: '100%',
+    label: 'Lead Artist Access',
+    description: 'Personalized attention from consultation through delivery.',
   },
 ];
 
-export const STORIES: WeddingStory[] = [
+export const SERVICES: ServiceItem[] = [
+  {
+    id: 'wedding-photography',
+    title: 'Wedding Photography',
+    category: 'Full Celebration',
+    summary: 'Comprehensive documentary and editorial photography covering pre-wedding ceremonies, haldi, baraat, phere, and reception.',
+    deliverables: ['High-res color graded digital archives', 'Curated preview gallery within 7 days', 'Online archival gallery for family sharing'],
+    featuredImage: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1000&q=80',
+  },
+  {
+    id: 'cinematic-films',
+    title: 'Cinematic Wedding Films',
+    category: 'Motion Picture',
+    summary: 'Emotional, story-driven films shot in 4K widescreen cinema format with rich ambient sound design and licensed music scoring.',
+    deliverables: ['3-5 minute cinematic teaser for Instagram', '20-40 minute documentary feature film', 'Full sacred vows & speeches recorded with wireless audio'],
+    featuredImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80',
+  },
+  {
+    id: 'pre-wedding',
+    title: 'Pre-Wedding Photography',
+    category: 'Intimate Story',
+    summary: 'Relaxed, creative couple portraits in scenic landscapes, heritage palace architecture, or modern urban environments.',
+    deliverables: ['Concept moodboard & location planning', '30-40 edited signature portraits', 'Cinematic save-the-date teaser option'],
+    featuredImage: 'https://images.unsplash.com/photo-1519225429980-715cb0215aed?auto=format&fit=crop&w=1000&q=80',
+  },
+  {
+    id: 'engagement',
+    title: 'Engagement Photography',
+    category: 'Milestone',
+    summary: 'Capturing the ring ceremony, family blessings, and intimate celebration marking the formal beginning of your journey.',
+    deliverables: ['Ring ceremony & rituals coverage', 'Couple portrait session at the venue', 'High-res downloadable master gallery'],
+    featuredImage: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1000&q=80',
+  },
+  {
+    id: 'traditional-rituals',
+    title: 'Traditional Photography',
+    category: 'Heritage',
+    summary: 'Deep respect for authentic Vedic rituals, Antarpat traditions, family groups, and ancestral heirloom aesthetics.',
+    deliverables: ['Complete stage & group portraits', 'Sacred ceremony details & decor documentation', 'Multi-camera coverage to miss zero rituals'],
+    featuredImage: 'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1000&q=80',
+  },
+  {
+    id: 'destination-weddings',
+    title: 'Destination Weddings',
+    category: 'Travel & Palaces',
+    summary: 'Turnkey cinematography and photography team traveling to heritage palaces, beaches, and vineyard estates across India and worldwide.',
+    deliverables: ['Travel & multi-day itinerary coordination', 'Drone aerial cinematography of destination venue', 'Rapid same-day preview edits for social sharing'],
+    featuredImage: 'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1000&q=80',
+  },
+];
+
+export const FEATURED_STORIES: StoryItem[] = [
   {
     id: 'akash-pooja',
     couple: 'Akash & Pooja',
-    locations: ['Sangli Palace Estate', 'Mumbai'],
+    title: 'The Royal Sangli Paithani Celebration',
+    category: 'Traditional Weddings',
+    location: 'Sangli Heritage Palace',
     year: '2026',
-    chapterTag: 'ROYAL MAHARANI PORTRAITURE',
-    tagline: 'Deep crimson royal Paithani silk, heritage gold jewellery, and soulful Maharashtrian vows.',
-    heroImage: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1600&q=85',
-    aspectRatio: '2.39:1',
-    exif: {
-      camera: 'Sony FX3 Cine Rig & A7R V',
-      lens: 'Sony G-Master 50mm f/1.2 & 85mm f/1.4',
-      focalLength: '50mm',
-      aperture: 'f/1.4',
-      iso: '400',
-      lut: 'Man With A Camera — Signature Warm Gold Film Emulation',
-    },
-    chapters: [
+    heroImage: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1400&q=85',
+    aspectRatio: '4/5',
+    caption: 'Pure scarlet red Paithani silk, heritage temple jewelry, and sacred Antarpat smiles.',
+    galleryImages: [
       {
-        title: 'I. The Haldi Rituals & Desi Marigolds',
-        timestamp: '00:30',
-        description: 'Vibrant yellow turmeric showers and joyful laughter in the ancestral Sangli courtyard.',
-        image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        title: 'II. The Royal Paithani Drape & Mundavalya',
-        timestamp: '03:15',
-        description: 'Pooja adorning handwoven pure silk Paithani with pearl mundavalya and heirloom nose ring.',
-        image: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1000&q=80',
-      },
-      {
-        title: 'III. Antarpat & The Golden Hour Saptapadi',
-        timestamp: '07:45',
-        description: 'The sacred cloth drops to tearful smiles and sacred Vedic mantras under torchlight.',
-        image: 'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1000&q=80',
-      },
-    ],
-    synopsis: 'A heartfelt tribute to royal Maharashtrian traditions filmed in Sangli. From the sacred sound of sanai and dhol tasha to intimate quiet glances behind the Antarpat, every frame was crafted with cinematic reverence.',
-    quote: '“Man With A Camera didn’t just film our wedding — they immortalized the real tears, laughs, and sacred moments our families will treasure forever.”',
-    gallery: [
-      {
-        url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
+        url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1400&q=85',
         caption: 'Pooja in traditional scarlet red Paithani with antique gold temple necklace.',
-        lens: 'G-Master 50mm f/1.2',
-        orientation: 'portrait',
-        filmStock: 'Man With A Camera 35mm Gold Profile',
       },
       {
-        url: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1200&q=85',
-        caption: 'Intricate mehendi details and family heirloom rings.',
-        lens: 'Sony 90mm Macro f/2.8',
-        orientation: 'square',
-        filmStock: 'Kodak Portra 400 Tone',
+        url: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1400&q=85',
+        caption: 'Heirloom jewelry and intricate bridal henna detailing.',
       },
       {
-        url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85',
-        caption: 'Akash arriving in royal ivory kurta and embroidered pheta turban.',
-        lens: 'Sony 35mm f/1.4 GM',
-        orientation: 'landscape',
-        filmStock: 'Warm Cine Film Profile',
-      },
-      {
-        url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1000&q=80',
-        caption: 'Sacred phere ceremony around the Agni flame.',
-        lens: 'Sony 85mm f/1.4 GM',
-        orientation: 'portrait',
-        filmStock: 'Natural Grain Tone',
+        url: 'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1400&q=85',
+        caption: 'Sacred saptapadi phere around the holy flame.',
       },
     ],
   },
   {
     id: 'abhi-rituja',
     couple: 'Abhi & Rituja',
-    locations: ['Mumbai Grand Ballroom', 'Sangli'],
+    title: 'Sunset Sangeet & Editorial Monochrome Stills',
+    category: 'Candid Moments',
+    location: 'Mumbai Grand Ballroom',
     year: '2026',
-    chapterTag: 'SANGLI & ROYAL SANGEET',
-    tagline: 'High-energy sangeet beats transitioning into soulful twilight ceremonies.',
-    heroImage: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1600&q=85',
-    aspectRatio: '2.39:1',
-    exif: {
-      camera: 'Sony FX6 Cine Line',
-      lens: 'Cooke 40mm Cine Lens & 85mm T1.5',
-      focalLength: '40mm',
-      aperture: 'T1.5',
-      iso: '800',
-      lut: 'Cinematic Noir & Warm Tungsten',
-    },
-    chapters: [
+    heroImage: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1400&q=85',
+    aspectRatio: '16/9',
+    caption: 'High-energy sangeet performances followed by quiet unscripted laughter under fairy lights.',
+    galleryImages: [
       {
-        title: 'I. The Sangeet Choreography & Flashmob',
-        timestamp: '00:45',
-        description: 'An electric night of dancing with theatrical stage lights in Mumbai.',
-        image: 'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1000&q=80',
+        url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1400&q=85',
+        caption: 'Abhi & Rituja sharing a quiet moment under candlelit chandeliers.',
       },
       {
-        title: 'II. Sunset Portraiture by the Shoreline',
-        timestamp: '04:20',
-        description: 'Golden hour breeze catching the emerald dupatta with gentle cinematic lens flare.',
-        image: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1000&q=80',
-      },
-    ],
-    synopsis: 'A fusion of urban Mumbai contemporary elegance and rooted Sangli warmth. Captured with dynamic camera motion, gimbal moves, and intimate prime lens close-ups.',
-    quote: '“They made us feel completely natural in front of the lens. The film looks like a Bollywood cinema release!”',
-    gallery: [
-      {
-        url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1200&q=85',
-        caption: 'Abhi and Rituja sharing a quiet moment under fairy lights.',
-        lens: 'Sony 50mm f/1.2 GM',
-        orientation: 'landscape',
-        filmStock: 'Kodak Vision3 500T',
-      },
-      {
-        url: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1000&q=80',
-        caption: 'Editorial monochrome bride portrait before the reception.',
-        lens: 'Leica 50mm f/0.95',
-        orientation: 'portrait',
-        filmStock: 'Ilford HP5 B&W',
+        url: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=1400&q=85',
+        caption: 'Editorial monochrome bridal portrait before the grand reception.',
       },
     ],
   },
   {
     id: 'suraj-anita',
     couple: 'Suraj & Anita',
-    locations: ['Nashik Vineyards & Sangli Escapes'],
+    title: 'Vineyard Twilight Vows',
+    category: 'Pre-Wedding',
+    location: 'Nashik Vineyards & Escapes',
     year: '2025',
-    chapterTag: '4K ANAMORPHIC FILMS',
-    tagline: 'An open-air sun-drenched celebration surrounded by rolling green hills and rustic stone.',
-    heroImage: 'https://images.unsplash.com/photo-1519225429980-715cb0215aed?auto=format&fit=crop&w=1600&q=85',
-    aspectRatio: '2.39:1',
-    exif: {
-      camera: 'Sony FX3 + DJI Ronin RS3 Pro',
-      lens: 'Sirui Anamorphic 50mm T2.9 1.6x',
-      focalLength: '50mm',
-      aperture: 'T2.9',
-      iso: '640',
-      lut: 'Mediterranean Sunset Gold',
-    },
-    chapters: [
+    heroImage: 'https://images.unsplash.com/photo-1519225429980-715cb0215aed?auto=format&fit=crop&w=1400&q=85',
+    aspectRatio: '4/5',
+    caption: 'Soft sunlight filtering through rolling green hills during their pre-wedding sunset session.',
+    galleryImages: [
       {
-        title: 'I. Morning Mist & First Look',
-        timestamp: '00:25',
-        description: 'Anita walking through the lush vineyard rows in a pastel blush pink lehenga.',
-        image: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1000&q=80',
+        url: 'https://images.unsplash.com/photo-1519225429980-715cb0215aed?auto=format&fit=crop&w=1400&q=85',
+        caption: 'Warm golden hour portrait in the vineyard rows.',
       },
       {
-        title: 'II. The Vows at Dusky Sunset',
-        timestamp: '05:00',
-        description: 'Exchanging garlands with golden flares reflecting in the wine country horizon.',
-        image: 'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=1000&q=80',
-      },
-    ],
-    synopsis: 'Shot in true 2.39:1 anamorphic widescreen. The soft bokeh and natural flares brought out the romantic European-style vineyard backdrop right in Maharashtra.',
-    quote: '“The attention to lighting and candid storytelling is second to none. Man With A Camera captures real raw emotion.”',
-    gallery: [
-      {
-        url: 'https://images.unsplash.com/photo-1519225429980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
-        caption: 'The couple surrounded by warm golden hour illumination.',
-        lens: 'Sirui Anamorphic 50mm',
-        orientation: 'landscape',
-        filmStock: 'Fuji Pro 400H Tone',
+        url: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1400&q=85',
+        caption: 'Candid laughter amidst sun-drenched vineyard paths.',
       },
     ],
   },
   {
     id: 'akshay-arti',
     couple: 'Akshay & Arti',
-    locations: ['Sangli Heritage Temple', 'Pune'],
+    title: 'Devotional Grandeur in Stone Arches',
+    category: 'Traditional Weddings',
+    location: 'Sangli Heritage Temple',
     year: '2025',
-    chapterTag: 'ARCHIVAL 35MM GRAIN',
-    tagline: 'Centuries of devotional grandeur, antique brass lamps, and timeless Marathi heritage.',
-    heroImage: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1600&q=85',
-    aspectRatio: '2.39:1',
-    exif: {
-      camera: 'Sony A7S III & Sony FX3',
-      lens: 'Zeiss Batis 40mm & 85mm f/1.8',
-      focalLength: '85mm',
-      aperture: 'f/1.8',
-      iso: '500',
-      lut: 'Heritage 35mm Celluloid Tone',
-    },
-    chapters: [
+    heroImage: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1400&q=85',
+    aspectRatio: '16/9',
+    caption: 'Centuries-old stone pillars echoing with sanai and ancestral family blessings.',
+    galleryImages: [
       {
-        title: 'I. The Sacred Temple Entry',
-        timestamp: '00:15',
-        description: 'Temple bells reverberating through the carved stone pillars of Sangli.',
-        image: 'https://images.unsplash.com/photo-1544077960-604201fe74bc?auto=format&fit=crop&w=1000&q=80',
+        url: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1400&q=85',
+        caption: 'The couple framed beneath ancient temple carved stone pillars.',
+      },
+      {
+        url: 'https://images.unsplash.com/photo-1544077960-604201fe74bc?auto=format&fit=crop&w=1400&q=85',
+        caption: 'Akshay arriving in hand-embroidered royal ivory sherwani.',
       },
     ],
-    synopsis: 'A devotional and heritage wedding focused on deep cultural traditions, handcrafted jewellery, and authentic emotional connections between two close-knit families.',
-    quote: '“more than love — we loved with a love that was more than love.”',
-    gallery: [
+  },
+  {
+    id: 'nikhil-smita',
+    couple: 'Nikhil & Smita',
+    title: 'Emerald Silk & Sunset Mandap',
+    category: 'Traditional Weddings',
+    location: 'Pune Heritage Resort',
+    year: '2026',
+    heroImage: 'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1400&q=85',
+    aspectRatio: '4/5',
+    caption: 'Handcrafted emerald Nauvari drape paired with delicate pearl mundavalya.',
+    galleryImages: [
       {
-        url: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?auto=format&fit=crop&w=1200&q=85',
-        caption: 'The newlywed couple framed within the ancient stone arches.',
-        lens: 'Zeiss 40mm f/2',
-        orientation: 'landscape',
-        filmStock: 'Man With A Camera Heritage Grain',
+        url: 'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=1400&q=85',
+        caption: 'First look moment before the evening reception.',
+      },
+    ],
+  },
+  {
+    id: 'umesh-pooja',
+    couple: 'Umesh & Pooja',
+    title: 'The Golden Mandap & Riverside Heritage Vows',
+    category: 'Traditional Weddings',
+    location: 'Sangli Heritage Ghats',
+    year: '2025',
+    heroImage: 'https://images.unsplash.com/photo-1544077960-604201fe74bc?auto=format&fit=crop&w=1400&q=85',
+    aspectRatio: '4/5',
+    caption: 'Sunlight glimmering along sacred Krishna river ghats, royal saffron turbans, and joyous floral showers.',
+    galleryImages: [
+      {
+        url: 'https://images.unsplash.com/photo-1544077960-604201fe74bc?auto=format&fit=crop&w=1400&q=85',
+        caption: 'Umesh & Pooja under the golden floral mandap.',
+      },
+      {
+        url: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=1400&q=85',
+        caption: 'Traditional bridal jewelry and turmeric rituals.',
+      },
+    ],
+  },
+  {
+    id: 'aniket-dhanashree',
+    couple: 'Aniket & Dhanashree',
+    title: 'The Yellow Marigold Haldi Festival',
+    category: 'Candid Moments',
+    location: 'Sangli Riverfront Estate',
+    year: '2025',
+    heroImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=85',
+    aspectRatio: '16/9',
+    caption: 'Golden turmeric clouds, spontaneous splashes, and unfiltered sibling joy.',
+    galleryImages: [
+      {
+        url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=85',
+        caption: 'The joyful explosion of turmeric and yellow marigold petals.',
+      },
+    ],
+  },
+  {
+    id: 'film-story-akash',
+    couple: 'Akash & Pooja',
+    title: 'The Royal Paithani Wedding Film',
+    category: 'Wedding Films',
+    location: 'Sangli & Mumbai',
+    year: '2026',
+    heroImage: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1400&q=85',
+    aspectRatio: '16/9',
+    caption: 'A 4K anamorphic cinema cut blending traditional Shehnai and modern acoustic strings.',
+    galleryImages: [
+      {
+        url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1400&q=85',
+        caption: 'Cinema still from the 4K feature film.',
       },
     ],
   },
 ];
 
-export const FILM_CLIPS = [
+export const CINEMATIC_FILMS: CinematicFilm[] = [
   {
     id: 'film-1',
     title: 'Akash & Pooja // The Royal Sangli Paithani Film',
@@ -333,135 +339,99 @@ export const FILM_CLIPS = [
     aspectRatio: '2.39:1',
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1600&q=85',
-    camera: 'Sony FX3 Cine Rig · 50mm f/1.2 GM',
-    audioTrack: 'Original Marathi Shehnai & Cinematic Acoustic Cello',
-    youtubeId: 'UC217RoGmgFjK7PSRiIQUBmg',
+    scoreDescription: 'Authentic Marathi Shehnai & Cinematic Acoustic Cello',
   },
   {
     id: 'film-2',
     title: 'Abhi & Rituja // Sangeet Crescendo & Sunset Vows',
     couple: 'Abhi & Rituja',
-    location: 'Mumbai & Sangli',
+    location: 'Mumbai Grand Ballroom',
     duration: '03:45',
     aspectRatio: '2.39:1',
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1600&q=85',
-    camera: 'Sony FX6 · Cooke Cine Primes 40mm',
-    audioTrack: 'Atmospheric Tabla Beats & Ambient Synth Strings',
-    youtubeId: 'UC217RoGmgFjK7PSRiIQUBmg',
+    scoreDescription: 'Atmospheric Tabla & Ambient String Harmonics',
   },
   {
     id: 'film-3',
     title: 'Suraj & Anita // Sunset Vows in the Vineyards',
     couple: 'Suraj & Anita',
-    location: 'Nashik & Destination Maharashtra',
+    location: 'Nashik Vineyards & Escapes',
     duration: '05:32',
     aspectRatio: '2.39:1',
     videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
     posterUrl: 'https://images.unsplash.com/photo-1519225429980-715cb0215aed?auto=format&fit=crop&w=1600&q=85',
-    camera: 'Sirui Anamorphic 50mm · 2.39:1 Scope',
-    audioTrack: 'Golden Hour Santoor & Acoustic Guitar Melodies',
-    youtubeId: 'UC217RoGmgFjK7PSRiIQUBmg',
+    scoreDescription: 'Golden Hour Santoor & Acoustic Guitar Reverberations',
   },
 ];
 
-export const CONTACT_SHEET_ITEMS = [
+export const APPROACH_PILLARS: ApproachPillar[] = [
   {
-    frameNo: '01',
-    title: 'Pooja in Crimson Paithani Silk',
-    couple: 'Akash // Pooja',
-    filmRoll: 'MAN WITH A CAMERA - SANGLI',
-    url: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=80',
-    meta: '50mm · f/1.4 · 1/500s · ISO 200',
-    category: 'Bride',
+    number: '01',
+    title: "Understanding Each Couple's Story",
+    description: 'Before lifting the camera, we invest time to learn your personality, family dynamics, and the personal memories that matter most to you.',
   },
   {
-    frameNo: '02',
-    title: 'Handcrafted Gold Kolhapuri Saaj',
-    couple: 'Akshay // Arti',
-    filmRoll: 'MAN WITH A CAMERA - DETAILS',
-    url: 'https://images.unsplash.com/photo-1606800052052-a08af7148866?auto=format&fit=crop&w=800&q=80',
-    meta: '90mm · f/2.8 · 1/250s · ISO 400',
-    category: 'Details',
+    number: '02',
+    title: 'Capturing Authentic Emotions',
+    description: 'We believe genuine smiles and happy tears happen naturally. Our unobtrusive presence allows you to be fully immersed in your celebration without stiff, forced poses.',
   },
   {
-    frameNo: '03',
-    title: 'Sacred Antarpat Drops with Smiles',
-    couple: 'Suraj // Anita',
-    filmRoll: 'MAN WITH A CAMERA - MOMENTS',
-    url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
-    meta: '35mm · f/1.4 · 1/800s · ISO 320',
-    category: 'Vows',
+    number: '03',
+    title: 'Documenting Meaningful Moments',
+    description: 'From sacred Vedic mantras and the Antarpat drop to quiet glances across a crowded ballroom, we document the rituals that will matter fifty years from today.',
   },
   {
-    frameNo: '04',
-    title: 'Nocturne Sangeet Under Fairy Lights',
-    couple: 'Abhi // Rituja',
-    filmRoll: 'MAN WITH A CAMERA - MUMBAI',
-    url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
-    meta: '85mm · f/1.4 · 1/160s · ISO 800',
-    category: 'Night',
-  },
-  {
-    frameNo: '05',
-    title: 'Sunlit Vineyard Walk & Laughter',
-    couple: 'UMESH // POOJA',
-    filmRoll: 'MAN WITH A CAMERA - ESCAPES',
-    url: 'https://images.unsplash.com/photo-1519225429980-715cb0215aed?auto=format&fit=crop&w=800&q=80',
-    meta: '50mm · f/1.8 · 1/1200s · ISO 100',
-    category: 'Moments',
-  },
-  {
-    frameNo: '06',
-    title: 'Emerald Nauvari Saree & Mundavalya',
-    couple: 'Nikhil // Smita',
-    filmRoll: 'MAN WITH A CAMERA - HERITAGE',
-    url: 'https://images.unsplash.com/photo-1529636798458-92182e662485?auto=format&fit=crop&w=800&q=80',
-    meta: '50mm · f/1.2 · 1/1000s · ISO 200',
-    category: 'Heritage',
-  },
-  {
-    frameNo: '07',
-    title: 'Groom Entry with Royal Pheta Turban',
-    couple: 'Aniket // Dhanashree',
-    filmRoll: 'MAN WITH A CAMERA - GROOM',
-    url: 'https://images.unsplash.com/photo-1544077960-604201fe74bc?auto=format&fit=crop&w=800&q=80',
-    meta: '85mm · f/1.8 · 1/400s · ISO 400',
-    category: 'Groom',
-  },
-  {
-    frameNo: '08',
-    title: 'Desi Gulab Petal Rain Over Phere',
-    couple: 'Akash // Pooja',
-    filmRoll: 'MAN WITH A CAMERA - CEREMONY',
-    url: 'https://images.unsplash.com/photo-1532712938310-34cb3982ef74?auto=format&fit=crop&w=800&q=80',
-    meta: '35mm · f/1.4 · 1/2000s · ISO 400',
-    category: 'Celebration',
+    number: '04',
+    title: 'Delivering Timeless Memories',
+    description: 'Every photograph and cinema reel is individually hand-graded with natural skin tones and organic warmth, delivered in archival albums and 4K digital vaults.',
   },
 ];
 
-export const VAULT_SPECS = [
+export const TESTIMONIALS: TestimonialItem[] = [
   {
-    category: 'CINEMA CAMERAS & SENSORS',
-    items: [
-      { name: 'Sony FX3 & FX6 Full-Frame Cinema Line', note: 'Dual native ISO, 15+ stops dynamic range, delivering true cinematic depth even in dimly-lit traditional mandaps.' },
-      { name: 'Sony A7R V High-Resolution Still Body', note: '61 megapixels of uncompressed detail for heirloom bridal portraits and printed albums.' },
-      { name: 'DJI Ronin RS3 Pro & Wireless Transmission', note: 'Buttery smooth tracking shots through vibrant baraat processions and energetic sangeet dances.' },
-    ],
+    quote: 'Man With A Camera captured our royal Paithani wedding with so much soul. Watching our film brings back every happy tear and the energy of the dhol tasha in Sangli! Our entire family was moved to tears.',
+    couple: 'Akash & Pooja',
+    venue: 'Sangli Heritage Palace',
+    year: '2026',
   },
   {
-    category: 'PRIME GLASS & OPTICS',
-    items: [
-      { name: 'Sony G-Master 50mm f/1.2 & 85mm f/1.4 GM', note: 'Creamy bokeh isolating couples from crowds with razor-sharp iris focus on bridal jewelry.' },
-      { name: 'Sirui Anamorphic 1.6x 50mm & 75mm', note: 'Widescreen 2.39:1 horizontal flare and cinematic oval bokeh for showstopper films.' },
-      { name: 'Sony FE 90mm f/2.8 Macro G OSS', note: 'Precision macro capture for wedding rings, mangalsutra, and intricate bridal mehendi.' },
-    ],
+    quote: 'From the chaotic Mumbai baraat to the quiet emotional moments with our parents before the vidai, their team felt like close friends who happened to create cinematic magic.',
+    couple: 'Abhi & Rituja',
+    venue: 'Grand Ballroom, Mumbai',
+    year: '2026',
   },
   {
-    category: 'COLOR SCIENCE & EDITORIAL POST',
-    items: [
-      { name: 'Signature Warm Gold Film Tone', note: 'Crafted over 10 years to honor Indian skin tones, vibrant paithani dyes, and warm candlelight.' },
-      { name: '4K Ultra-HD Master Delivery & RAW Archive', note: 'Complete archival preservation formatted for large 4K OLED screens and future generations.' },
-    ],
+    quote: 'The attention to natural lighting and candid emotion is unmatched. They made us feel completely relaxed, and our vineyard pre-wedding and wedding film look like a cinema production!',
+    couple: 'Suraj & Anita',
+    venue: 'Nashik Vineyards',
+    year: '2025',
+  },
+];
+
+export const FAQS: FAQItem[] = [
+  {
+    question: 'How do we book a wedding date?',
+    answer: 'You can check your date using our website inquiry drawer or reach out directly on WhatsApp at +91 97660 66092. Once we confirm availability for your date and location, we finalize the package and lock your date with a booking advance.',
+  },
+  {
+    question: 'How early should we book?',
+    answer: 'Because we accept a limited number of weddings per season to maintain personal artistic quality, we recommend inquiring 4 to 8 months in advance, especially for peak winter wedding dates between November and February.',
+  },
+  {
+    question: 'Do you travel for destination weddings?',
+    answer: 'Yes! Based in Sangli and Mumbai, we travel extensively across Maharashtra, Goa, Rajasthan, and destination wedding venues throughout India and internationally.',
+  },
+  {
+    question: 'What photography packages are available?',
+    answer: 'We offer customizable packages tailored to your celebration scale, ranging from single-day traditional weddings to multi-day royal celebrations. Packages can include senior photography, 4K cinematic films, pre-wedding sessions, drone coverage, and handcrafted heirloom albums.',
+  },
+  {
+    question: 'How long does photo delivery take?',
+    answer: 'We provide a curated preview of 30-50 signature highlight photos within 7 to 10 days after your wedding. Complete color-graded photograph collections and cinematic films are carefully polished and delivered within 4 to 8 weeks.',
+  },
+  {
+    question: 'Do you provide cinematic wedding films?',
+    answer: 'Yes. We specialize in both photography and cinema. Our film packages include an emotional 3-5 minute cinematic teaser suitable for sharing with loved ones, alongside an extended 25-45 minute documentary film preserving vows, speeches, and complete rituals.',
   },
 ];

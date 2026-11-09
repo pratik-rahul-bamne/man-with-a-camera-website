@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  --color-canvas: #080808;
+  --color-surface-elevated: #101010;
+  --color-surface-panel: #141414;
+  --color-gold: #C6A477;
+  --color-gold-light: #e5c192;
+  --color-gold-tint: rgba(198, 164, 119, 0.18);
+  --color-ivory: #F5F0E8;
+  --color-stone-muted: #A6A19A;
+}
+
+@layer base {
+  body {
+    background-color: #080808;
+    color: #F5F0E8;
+    font-family: 'Manrope', sans-serif;
+  }
+
+  h1, h2, h3, h4, .font-editorial {
+    font-family: 'Playfair Display', Georgia, serif;
+  }
+}
+
+/* Custom cinematic grain & subtle projection lighting */
+.cinematic-vignette {
+  background: radial-gradient(circle at 50% 30%, rgba(20, 20, 20, 0) 0%, rgba(8, 8, 8, 0.7) 70%, rgba(8, 8, 8, 0.95) 100%);
+}
+
+.gold-halo {
+  box-shadow: 0 16px 48px -12px rgba(198, 164, 119, 0.14);
+}
+
+.gold-halo-lg {
+  box-shadow: 0 24px 64px -12px rgba(198, 164, 119, 0.22);
+}
+
+/* Crisp 0px borders */
+* {
+  border-radius: 0px !important;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080808;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2825;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C6A477;
+}
